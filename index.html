@@ -1,0 +1,3073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Menu Pro - Complete Digital Menu Solution</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* App States */
+        .app-screen {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .app-screen.active {
+            display: block;
+        }
+
+        /* Animated Background */
+        .animated-bg {
+            background-image: url(https://images.pexels.com/photos/683039/pexels-photo-683039.jpeg?cs=srgb&dl=pexels-apgpotr-683039.jpg&fm=jpg);
+            background-size: cover;
+            background-attachment: fixed;
+        }
+
+        .animated-bg::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="g"><stop offset="20%" stop-color="rgba(255,255,255,0.1)"/><stop offset="80%" stop-color="rgba(255,255,255,0)"/></radialGradient></defs><circle cx="50" cy="50" r="20" fill="url(%23g)"/></svg>') repeat;
+            animation: float 20s linear infinite;
+            top: -50%;
+            left: -50%;
+        }
+
+        @keyframes float {
+            0% { transform: translateX(0) translateY(0) rotate(0deg); }
+            100% { transform: translateX(-100px) translateY(-100px) rotate(360deg); }
+        }
+
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 600;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            transition: all 0.3s;
+            transform: translateX(-50%);
+        }
+
+        .nav-links a:hover {
+            color: #667eea;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 120px 0 80px;
+            text-align: center;
+            color: white;
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 20px rgba(0,0,0,0.3);
+            font-weight: 900;
+            background: linear-gradient(135deg, #fff, #f0f0ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 20px rgba(255,255,255,0.5); }
+            to { text-shadow: 0 0 30px rgba(255,255,255,0.8), 0 0 40px rgba(102, 126, 234, 0.3); }
+        }
+
+        .hero .subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.95;
+            font-weight: 600;
+        }
+
+        .hero .description {
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+            opacity: 0.9;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        .btn-hero {
+            padding: 1.2rem 3rem;
+            font-size: 1.1rem;
+            border-radius: 60px;
+        }
+
+        .btn-hero-primary {
+            background: rgba(255, 255, 255, 0.95);
+            color: #667eea;
+            font-weight: 700;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-hero-primary:hover {
+            background: white;
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .btn-hero-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-hero-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: white;
+            transform: translateY(-5px);
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: 100px 0;
+            background: white;
+            position: relative;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 900;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 4rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+            margin-top: 4rem;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+            padding: 3rem 2rem;
+            border-radius: 25px;
+            text-align: center;
+            transition: all 0.4s ease;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+            transition: left 0.6s;
+        }
+
+        .feature-card:hover::before {
+            left: 100%;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(102, 126, 234, 0.2);
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+        }
+
+        .feature-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #333;
+            font-weight: 700;
+        }
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.7;
+            font-size: 1.1rem;
+        }
+
+        /* Pricing Section */
+        .pricing-section {
+            padding: 100px 0;
+            background: linear-gradient(135deg, #f8f9ff 0%, #e8edff 100%);
+            position: relative;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+            margin-top: 4rem;
+        }
+
+        .pricing-card {
+            background: white;
+            border-radius: 30px;
+            padding: 3rem;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+            transition: all 0.4s ease;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+        }
+
+        .pricing-card.popular {
+            border: 3px solid;
+            border-image: linear-gradient(135deg, #667eea, #764ba2) 1;
+            transform: scale(1.05);
+            position: relative;
+        }
+
+        .pricing-card.popular::before {
+            content: '🌟 Most Popular';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 0.7rem 2rem;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .plan-name {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .plan-price {
+            font-size: 3.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .plan-period {
+            color: #666;
+            margin-bottom: 2.5rem;
+            font-size: 1.1rem;
+        }
+
+        .plan-features {
+            list-style: none;
+            margin-bottom: 3rem;
+            text-align: left;
+        }
+
+        .plan-features li {
+            padding: 0.8rem 0;
+            color: #555;
+            font-size: 1.1rem;
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .plan-features li::before {
+            content: '✨';
+            position: absolute;
+            left: 0;
+            top: 0.8rem;
+            font-size: 1.2rem;
+        }
+
+        /* Auth Forms */
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 120px 0 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+        }
+
+        .auth-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 4rem;
+            border-radius: 30px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 450px;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .auth-card h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 1.2rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 15px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+            background: white;
+        }
+
+        .auth-links {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .auth-links a {
+            color: #667eea;
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .auth-links a:hover {
+            color: #764ba2;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            background: linear-gradient(135deg, #f8f9ff 0%, #e8edff 100%);
+            min-height: 100vh;
+            padding-top: 80px;
+        }
+
+        .dashboard-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 2rem 0;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .dashboard-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dashboard-nav h2 {
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .dashboard-content {
+            padding: 3rem 0;
+        }
+
+        .dashboard-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            padding: 1.5rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 1rem 2rem;
+            background: transparent;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .tab:hover:not(.active) {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            padding: 3rem;
+            border-radius: 25px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Notifications */
+        .notification {
+            position: fixed;
+            top: 120px;
+            right: 30px;
+            background: linear-gradient(135deg, #4caf50, #45a049);
+            color: white;
+            padding: 1.2rem 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(76, 175, 80, 0.3);
+            z-index: 1002;
+            transform: translateX(400px);
+            transition: transform 0.4s ease;
+            font-weight: 600;
+            backdrop-filter: blur(20px);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            box-shadow: 0 10px 30px rgba(244, 67, 54, 0.3);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 2.5rem;
+            border-radius: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.3);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Menu Builder */
+        .menu-builder {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+        }
+
+        .menu-form {
+            background: rgba(248, 249, 255, 0.8);
+            backdrop-filter: blur(20px);
+            padding: 2.5rem;
+            border-radius: 20px;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .menu-preview {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            padding: 2.5rem;
+            border-radius: 20px;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .menu-item {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .menu-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .menu-item-info h4 {
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 700;
+        }
+
+        .menu-item-price {
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.3rem;
+        }
+
+        .menu-item-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            border-radius: 8px;
+            min-width: 80px;
+        }
+
+        /* Customer Menu */
+        .customer-menu {
+            background: white;
+            min-height: 100vh;
+        }
+
+        .restaurant-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .restaurant-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="80" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="60" r="1" fill="rgba(255,255,255,0.05)"/></svg>') repeat;
+            animation: float 15s linear infinite;
+        }
+
+        .restaurant-header h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            font-weight: 900;
+            position: relative;
+            z-index: 2;
+        }
+
+        .restaurant-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+
+        .menu-categories {
+            padding: 3rem;
+            background: linear-gradient(135deg, #f8f9ff 0%, #e8edff 100%);
+        }
+
+        .category {
+            margin-bottom: 4rem;
+        }
+
+        .category h3 {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+            border-bottom: 3px solid;
+            border-image: linear-gradient(135deg, #667eea, #764ba2) 1;
+            padding-bottom: 1rem;
+        }
+
+        .customer-menu-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            border-radius: 20px;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .customer-menu-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.15);
+            border-color: #667eea;
+        }
+
+        .item-image {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 15px;
+            margin-right: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .item-details {
+            flex: 1;
+        }
+
+        .item-details h4 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 700;
+        }
+
+        .item-tags {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .tag.veg { 
+            background: linear-gradient(135deg, #4caf50, #45a049); 
+            color: white; 
+        }
+        .tag.non-veg { 
+            background: linear-gradient(135deg, #f44336, #d32f2f); 
+            color: white; 
+        }
+        .tag.spicy { 
+            background: linear-gradient(135deg, #ff9800, #f57c00); 
+            color: white; 
+        }
+        .tag.popular {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .add-to-cart {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .add-to-cart:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Cart */
+        .cart-sidebar {
+            position: fixed;
+            right: -450px;
+            top: 0;
+            width: 450px;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            box-shadow: -10px 0 30px rgba(0,0,0,0.2);
+            transition: right 0.4s ease;
+            z-index: 1001;
+            padding: 2rem;
+            overflow-y: auto;
+            border-left: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .cart-sidebar.open {
+            right: 0;
+        }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .cart-header h3 {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+            font-size: 1.5rem;
+        }
+
+        .close-cart {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .close-cart:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+            transition: all 0.3s;
+        }
+
+        .cart-item:hover {
+            background: rgba(102, 126, 234, 0.05);
+            padding-left: 1rem;
+            padding-right: 1rem;
+            border-radius: 10px;
+            margin: 0 -1rem;
+        }
+
+        .cart-item h5 {
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .quantity-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .quantity-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .quantity-display {
+            margin: 0 0.8rem;
+            font-weight: 600;
+            color: #333;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .cart-total {
+            font-size: 1.5rem;
+            font-weight: 800;
+            text-align: center;
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border-radius: 15px;
+            color: #333;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .floating-cart-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            font-size: 1.8rem;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            z-index: 1000;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .floating-cart-btn:hover {
+            transform: scale(1.1) translateY(-5px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #f44336;
+            color: white;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        /* QR Code Display */
+        .qr-container {
+            text-align: center;
+            padding: 3rem;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .qr-code {
+            width: 250px;
+            height: 250px;
+            margin: 2rem auto;
+            background: linear-gradient(135deg, #f8f9ff, #e8edff);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: #666;
+            border: 3px solid rgba(102, 126, 234, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .qr-code::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+            animation: scan 2s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(0deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(0deg); }
+        }
+
+        .qr-code-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        /* Mobile Navigation */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #333;
+            z-index: 1001;
+        }
+
+        .mobile-nav {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 80%;
+            max-width: 300px;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            padding: 5rem 2rem 2rem;
+            transition: right 0.3s ease;
+            box-shadow: -5px 0 25px rgba(0,0,0,0.1);
+        }
+
+        .mobile-nav.open {
+            right: 0;
+        }
+
+        .mobile-nav-links {
+            list-style: none;
+            margin-top: 2rem;
+        }
+
+        .mobile-nav-links li {
+            margin-bottom: 1.5rem;
+        }
+
+        .mobile-nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 600;
+            font-size: 1.2rem;
+            display: block;
+            padding: 0.5rem 0;
+            transition: color 0.3s;
+        }
+
+        .mobile-nav-links a:hover {
+            color: #667eea;
+        }
+
+        .close-mobile-nav {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #333;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .menu-builder {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .hero h1 {
+                font-size: 3rem;
+            }
+            
+            .section-title {
+                font-size: 2.5rem;
+            }
+            
+            .feature-card, .pricing-card {
+                padding: 2rem 1.5rem;
+            }
+            
+            .dashboard-tabs {
+                overflow-x: auto;
+                padding-bottom: 1rem;
+            }
+            
+            .tab {
+                padding: 0.8rem 1.5rem;
+                white-space: nowrap;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .nav-links, .auth-buttons {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero .subtitle {
+                font-size: 1.3rem;
+            }
+            
+            .hero .description {
+                font-size: 1.1rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn-hero {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .features-grid, .pricing-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .pricing-card.popular {
+                transform: none;
+            }
+            
+            .cart-sidebar {
+                width: 100vw;
+                right: -100vw;
+            }
+            
+            .dashboard-tabs {
+                flex-wrap: nowrap;
+                gap: 0.5rem;
+            }
+            
+            .tab {
+                flex: 0 0 auto;
+                min-width: 120px;
+            }
+            
+            .customer-menu-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+            
+            .item-image {
+                margin-right: 0;
+                margin-bottom: 1rem;
+            }
+            
+            .auth-card {
+                padding: 2rem;
+                margin: 0 1rem;
+            }
+            
+            .container {
+                padding: 0 15px;
+            }
+            
+            .menu-categories, .restaurant-header {
+                padding: 2rem 1.5rem;
+            }
+            
+            .tab-content {
+                padding: 2rem;
+            }
+            
+            .menu-form, .menu-preview {
+                padding: 2rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .stat-card {
+                padding: 1.5rem;
+            }
+            
+            .stat-number {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .hero .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .btn-hero {
+                padding: 1rem 2rem;
+                font-size: 1rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .section-subtitle {
+                font-size: 1rem;
+            }
+            
+            .auth-card {
+                padding: 1.5rem;
+            }
+            
+            .floating-cart-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+                bottom: 20px;
+                right: 20px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard-tabs {
+                padding: 1rem;
+            }
+            
+            .tab {
+                padding: 0.7rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .menu-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+            
+            .menu-item-actions {
+                justify-content: center;
+            }
+            
+            .restaurant-header h2 {
+                font-size: 2rem;
+            }
+            
+            .restaurant-header p {
+                font-size: 1rem;
+            }
+            
+            .category h3 {
+                font-size: 1.7rem;
+            }
+            
+            .customer-menu-item {
+                padding: 1.5rem;
+            }
+            
+            .qr-container {
+                padding: 2rem 1.5rem;
+            }
+            
+            .qr-code {
+                width: 200px;
+                height: 200px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+            
+            .logo {
+                font-size: 1.5rem;
+            }
+            
+            .btn {
+                padding: 0.7rem 1.5rem;
+            }
+            
+            .feature-card, .pricing-card {
+                padding: 1.5rem 1rem;
+            }
+            
+            .feature-icon {
+                font-size: 3rem;
+            }
+            
+            .plan-price {
+                font-size: 2.5rem;
+            }
+            
+            .tab {
+                padding: 0.6rem 0.8rem;
+                font-size: 0.8rem;
+                min-width: 100px;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(102, 126, 234, 0.3);
+            border-radius: 50%;
+            border-top-color: #667eea;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Success States */
+        .success-message {
+            background: linear-gradient(135deg, #4caf50, #45a049);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            text-align: center;
+            margin: 1rem 0;
+            font-weight: 600;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Glassmorphism Effects */
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .glass-dark {
+            background: rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 0, 0, 0.2);
+        }
+
+        /* Scroll Animations */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #5a6fd8, #6a4190);
+        }
+
+        /* Touch improvements for mobile */
+        @media (hover: none) {
+            .btn:hover, .feature-card:hover, .pricing-card:hover, 
+            .customer-menu-item:hover, .cart-item:hover, 
+            .tab:hover:not(.active), .add-to-cart:hover,
+            .quantity-btn:hover, .btn-hero-primary:hover,
+            .btn-hero-secondary:hover {
+                transform: none;
+            }
+            
+            .btn::before {
+                display: none;
+            }
+        }
+
+        /* Prevent zoom on input focus for mobile */
+        @media (max-width: 768px) {
+            input, select, textarea {
+                font-size: 16px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav class="container">
+            <div class="logo" onclick="showScreen('landing')">🍽️ QR Menu Pro</div>
+            
+            <button class="mobile-menu-btn" onclick="toggleMobileNav()">☰</button>
+            
+            <ul class="nav-links">
+                <li><a onclick="showScreen('landing')">Home</a></li>
+                <li><a onclick="scrollToFeatures()">Features</a></li>
+                <li><a onclick="scrollToPricing()">Pricing</a></li>
+                <li><a onclick="showScreen('demo')">Demo</a></li>
+            </ul>
+            <div class="auth-buttons" id="authButtons">
+                <button class="btn btn-secondary" onclick="showScreen('login')">Login</button>
+                <button class="btn btn-primary" onclick="showScreen('signup')">Start Free Trial</button>
+            </div>
+            <div class="user-info" id="userInfo" style="display: none;">
+                <span id="userName">Restaurant Owner</span>
+                <button class="btn btn-secondary" onclick="logout()">Logout</button>
+            </div>
+        </nav>
+        
+        <!-- Mobile Navigation -->
+        <div class="mobile-nav" id="mobileNav">
+            <button class="close-mobile-nav" onclick="toggleMobileNav()">✕</button>
+            <ul class="mobile-nav-links">
+                <li><a onclick="showScreen('landing'); toggleMobileNav();">Home</a></li>
+                <li><a onclick="scrollToFeatures(); toggleMobileNav();">Features</a></li>
+                <li><a onclick="scrollToPricing(); toggleMobileNav();">Pricing</a></li>
+                <li><a onclick="showScreen('demo'); toggleMobileNav();">Demo</a></li>
+                <li><a onclick="showScreen('login'); toggleMobileNav();">Login</a></li>
+                <li><a onclick="showScreen('signup'); toggleMobileNav();">Start Free Trial</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- Landing Page -->
+    <div class="app-screen active animated-bg" id="landing">
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1>🍽️ QR Menu Platform</h1>
+                    <p class="subtitle">Complete Digital Menu Solution</p>
+                    <p class="description">Revolutionize Your Restaurant's Digital Presence with Our All-in-One QR Menu Platform!</p>
+                    <div class="hero-buttons">
+                        <button class="btn btn-hero btn-hero-primary" onclick="showScreen('signup')">🚀 Start 7-Day Free Trial</button>
+                        <button class="btn btn-hero btn-hero-secondary" onclick="showScreen('demo')">🎬 Watch Demo</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features-section" id="featuresSection">
+            <div class="container">
+                <h2 class="section-title">✨ Key Features</h2>
+                <p class="section-subtitle">Everything you need to digitize your restaurant menu</p>
+                
+                <div class="features-grid">
+                    <div class="feature-card fade-in-up">
+                        <div class="feature-icon">🔐</div>
+                        <h3>Secure Login System</h3>
+                        <p>Personalized dashboard for each restaurant with enterprise-grade security and data protection</p>
+                    </div>
+                    
+                    <div class="feature-card fade-in-up">
+                        <div class="feature-icon">🎨</div>
+                        <h3>Easy Menu Builder</h3>
+                        <p>Intuitive drag-and-drop interface for effortless menu management and real-time updates</p>
+                    </div>
+                    
+                    <div class="feature-card fade-in-up">
+                        <div class="feature-icon">📱</div>
+                        <h3>Smart QR Codes</h3>
+                        <p>Generate instant QR codes for tables, takeaway, and delivery with custom branding</p>
+                    </div>
+                    
+                    <div class="feature-card fade-in-up">
+                        <div class="feature-icon">📊</div>
+                        <h3>Live Analytics</h3>
+                        <p>Track orders, popular items, and customer behavior with real-time insights and reports</p>
+                    </div>
+                    
+                    <div class="feature-card fade-in-up">
+                        <div class="feature-icon">🖼️</div>
+                        <h3>Image Management</h3>
+                        <p>Upload stunning food images to entice customers and boost sales with visual appeal</p>
+                    </div>
+                    
+                    <div class="feature-card fade-in-up">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Instant Updates</h3>
+                        <p>Change menu items, prices, and availability instantly across all customer devices</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Section -->
+        <section class="pricing-section" id="pricingSection">
+            <div class="container">
+                <h2 class="section-title">💰 Choose Your Plan</h2>
+                <p class="section-subtitle">Flexible pricing for restaurants of all sizes</p>
+                
+                <div class="pricing-grid">
+                    <div class="pricing-card fade-in-up">
+                        <div class="plan-name">Basic Starter</div>
+                        <div class="plan-price">₹999</div>
+                        <div class="plan-period">per month</div>
+                        <ul class="plan-features">
+                            <li>Up to 50 menu items</li>
+                            <li>only QR code</li>
+                            <li>Basic analytics dashboard</li>
+                            <li>Email support</li>
+                            <li>SSL security</li>
+                        </ul>
+                        <button class="btn btn-primary" onclick="showScreen('signup')">Get Started</button>
+                    </div>
+                    
+                    <div class="pricing-card popular fade-in-up">
+                        <div class="plan-name">Premium Pro</div>
+                        <div class="plan-price">₹1,199</div>
+                        <div class="plan-period">per month</div>
+                        <ul class="plan-features">
+                            <li>Unlimited menu items</li>
+                            <li> QR codes + (tables/takeaway/delivery)</li>
+                            <li>Advanced analytics & insights</li>
+                            <li>Priority 24/7 support</li>
+                            <li>Custom branding & themes</li>
+                            <li>Order management system</li>
+                        </ul>
+                        <button class="btn btn-primary" onclick="showScreen('signup')">Most Popular</button>
+                    </div>
+                    
+                    <div class="pricing-card fade-in-up">
+                        <div class="plan-name">Enterprise</div>
+                        <div class="plan-price">₹1,999</div>
+                        <div class="plan-period">per month</div>
+                        <ul class="plan-features">
+                            <li>Everything in Premium</li>
+                            <li>Unlimited QR codes</li>
+                            <li>Dedicated account manager</li>
+                            <li>API access & integrations</li>
+                            <li>Custom development</li>
+                            <li>White-label solution</li>
+                        </ul>
+                        <button class="btn btn-primary" onclick="showScreen('signup')">Contact Sales</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Signup -->
+    <div class="app-screen animated-bg" id="signup">
+        <div class="auth-container">
+            <div class="auth-card">
+                <h2>🚀 Start Your Free Trial</h2>
+                <form id="signupForm">
+                    <div class="form-group">
+                        <label>🏪 Restaurant Name</label>
+                        <input type="text" id="restaurantName" placeholder="Enter your restaurant name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>👤 Owner Name</label>
+                        <input type="text" id="ownerName" placeholder="Your full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>📧 Email Address</label>
+                        <input type="email" id="email" placeholder="your@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>📱 Phone Number</label>
+                        <input type="tel" id="phone" placeholder="+91 98765 43210" required>
+                    </div>
+                    <div class="form-group">
+                        <label>🔐 Password</label>
+                        <input type="password" id="password" placeholder="Create a strong password" required>
+                    </div>
+                    <div class="form-group">
+                        <label>📋 Choose Plan</label>
+                        <select id="plan">
+                            <option value="basic">Basic Starter - ₹999/month</option>
+                            <option value="premium" selected>Premium Pro - ₹1,199/month</option>
+                            <option value="enterprise">Enterprise - ₹1,999/month</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                        Create Account & Start Trial
+                    </button>
+                </form>
+                <div class="auth-links">
+                    <p>Already have an account? <a onclick="showScreen('login')">Login here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login -->
+    <div class="app-screen animated-bg" id="login">
+        <div class="auth-container">
+            <div class="auth-card">
+                <h2>🔐 Welcome Back</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label>📧 Email Address</label>
+                        <input type="email" id="loginEmail" placeholder="your@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>🔐 Password</label>
+                        <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                        Login to Dashboard
+                    </button>
+                </form>
+                <div class="auth-links">
+                    <p>Don't have an account? <a onclick="showScreen('signup')">Sign up for free</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="app-screen" id="dashboard">
+        <div class="dashboard">
+            <div class="dashboard-header">
+                <div class="container">
+                    <div class="dashboard-nav">
+                        <h2>📊 Dashboard - <span id="dashboardRestaurantName">My Restaurant</span></h2>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="container dashboard-content">
+                <div class="dashboard-tabs">
+                    <button class="tab active" onclick="showTab('overview')">📈 Overview</button>
+                    <button class="tab" onclick="showTab('menu')">🍽️ Menu Builder</button>
+                    <button class="tab" onclick="showTab('qr')">📱 QR Codes</button>
+                    <button class="tab" onclick="showTab('orders')">📋 Orders</button>
+                    <button class="tab" onclick="showTab('analytics')">📊 Analytics</button>
+                </div>
+
+                <!-- Overview Tab -->
+                <div class="tab-content active" id="overview">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">156</div>
+                            <div class="stat-label">Orders Today</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">₹12,450</div>
+                            <div class="stat-label">Revenue Today</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">23</div>
+                            <div class="stat-label">Menu Items</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">4.8⭐</div>
+                            <div class="stat-label">Average Rating</div>
+                        </div>
+                    </div>
+                    
+                    <h3 style="margin-bottom: 2rem; color: #333;">🚀 Quick Actions</h3>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <button class="btn btn-primary" onclick="showTab('menu')">➕ Add Menu Item</button>
+                        <button class="btn btn-secondary" onclick="showTab('qr')">📱 Generate QR Code</button>
+                        <button class="btn btn-secondary" onclick="showScreen('customerMenu')">👁️ Preview Menu</button>
+                        <button class="btn btn-secondary" onclick="showTab('analytics')">📊 View Reports</button>
+                    </div>
+                </div>
+
+                <!-- Menu Builder Tab -->
+                <div class="tab-content" id="menu">
+                    <h3 style="margin-bottom: 2rem; color: #333;">🍽️ Menu Builder</h3>
+                    <div class="menu-builder">
+                        <div class="menu-form">
+                            <h4 style="margin-bottom: 1.5rem; color: #667eea;">➕ Add New Item</h4>
+                            <form id="menuItemForm">
+                                <div class="form-group">
+                                    <label>🍽️ Item Name</label>
+                                    <input type="text" id="itemName" placeholder="e.g., Butter Chicken" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>📝 Description</label>
+                                    <textarea id="itemDescription" rows="3" placeholder="Delicious item description..."></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label>💰 Price (₹)</label>
+                                    <input type="number" id="itemPrice" placeholder="280" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>📂 Category</label>
+                                    <select id="itemCategory">
+                                        <option value="starters">🥗 Starters</option>
+                                        <option value="mains">🍛 Main Course</option>
+                                        <option value="desserts">🍰 Desserts</option>
+                                        <option value="beverages">🥤 Beverages</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>🏷️ Tags</label>
+                                    <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 0.5rem;">
+                                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <input type="checkbox" id="tagVeg" value="veg"> 🌱 Vegetarian
+                                        </label>
+                                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <input type="checkbox" id="tagSpicy" value="spicy"> 🌶️ Spicy
+                                        </label>
+                                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <input type="checkbox" id="tagPopular" value="popular"> ⭐ Popular
+                                        </label>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                                    ➕ Add to Menu
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <div class="menu-preview">
+                            <h4 style="margin-bottom: 1.5rem; color: #667eea;">👁️ Menu Preview</h4>
+                            <div id="menuItems"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QR Codes Tab -->
+                <div class="tab-content" id="qr">
+                    <h3 style="margin-bottom: 2rem; color: #333;">📱 QR Code Generator</h3>
+                    <div class="qr-container">
+                        <h4 style="margin-bottom: 1rem; color: #667eea;">Your Restaurant QR Code</h4>
+                        <div class="qr-code" id="qrCode">
+                            <div class="qr-code-content">
+                                <div style="font-size: 4rem; margin-bottom: 1rem;">📱</div>
+                                <div>QR Code<br>Generated Here</div>
+                            </div>
+                        </div>
+                        <p style="margin-bottom: 2rem; color: #666;">Customers scan this code to view your digital menu</p>
+                        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="generateQR()">🔄 Generate New QR</button>
+                            <button class="btn btn-secondary" onclick="downloadQR()">💾 Download QR</button>
+                            <button class="btn btn-secondary" onclick="printQR()">🖨️ Print QR</button>
+                        </div>
+                        <div style="margin-top: 2rem;">
+                            <h5 style="color: #667eea; margin-bottom: 0.5rem;">🔗 Menu URL:</h5>
+                            <input type="text" id="menuUrl" readonly style="width: 100%; padding: 1rem; background: rgba(102, 126, 234, 0.1); border: 1px solid rgba(102, 126, 234, 0.2); border-radius: 10px; color: #667eea; font-weight: 600;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Orders Tab -->
+                <div class="tab-content" id="orders">
+                    <h3 style="margin-bottom: 2rem; color: #333;">📋 Order Management</h3>
+                    <div id="ordersList"></div>
+                </div>
+
+                <!-- Analytics Tab -->
+                <div class="tab-content" id="analytics">
+                    <h3 style="margin-bottom: 2rem; color: #333;">📊 Sales Analytics</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">1,234</div>
+                            <div class="stat-label">Monthly Orders</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">₹89,450</div>
+                            <div class="stat-label">Monthly Revenue</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">Butter Chicken</div>
+                            <div class="stat-label">Most Popular Item</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">2.5 min</div>
+                            <div class="stat-label">Avg. Order Time</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer Menu View -->
+    <div class="app-screen" id="customerMenu">
+        <div class="customer-menu">
+            <div class="restaurant-header">
+                <h2 id="customerRestaurantName">🍽️ Tasty Bites Restaurant</h2>
+                <p style="font-size: 1.3rem; margin: 0.5rem 0;">🇮🇳 Authentic Indian Cuisine</p>
+                <p style="font-size: 1.1rem; opacity: 0.9;">📍 Connaught Place, New Delhi | ⭐ 4.8 Rating (1,250+ reviews) | 🕒 Open Now</p>
+                <p style="font-size: 1rem; margin-top: 1rem; opacity: 0.8;">📱 Scan • 🍽️ Order • 😋 Enjoy | No App Required!</p>
+            </div>
+            
+            <div class="menu-categories">
+                <div class="category">
+                    <h3>🥗 Starters & Appetizers</h3>
+                    <div id="startersItems"></div>
+                </div>
+                
+                <div class="category">
+                    <h3>🍛 Main Course Delights</h3>
+                    <div id="mainsItems"></div>
+                </div>
+                
+                <div class="category">
+                    <h3>🍰 Sweet Desserts</h3>
+                    <div id="dessertsItems"></div>
+                </div>
+                
+                <div class="category">
+                    <h3>🥤 Refreshing Beverages</h3>
+                    <div id="beveragesItems"></div>
+                </div>
+            </div>
+
+            <!-- Special Offers Section -->
+            <div style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 3rem; text-align: center; margin: 2rem;">
+                <h3 style="font-size: 2rem; margin-bottom: 1rem;">🎉 Special Offers Today!</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 2rem;">
+                    <div style="background: rgba(255,255,255,0.1); padding: 2rem; border-radius: 15px; backdrop-filter: blur(10px);">
+                        <h4>🍛 Combo Deal</h4>
+                        <p>Any Main Course + Beverage</p>
+                        <p style="font-size: 1.5rem; font-weight: bold;">Save ₹100</p>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.1); padding: 2rem; border-radius: 15px; backdrop-filter: blur(10px);">
+                        <h4>🎂 Family Pack</h4>
+                        <p>4 Main Course + 2 Starters</p>
+                        <p style="font-size: 1.5rem; font-weight: bold;">20% OFF</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Restaurant Info -->
+            <div style="background: white; padding: 3rem; text-align: center;">
+                <h3 style="color: #333; margin-bottom: 2rem;">🏪 About Our Restaurant</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; text-align: left;">
+                    <div>
+                        <h4 style="color: #667eea; margin-bottom: 1rem;">📍 Location & Hours</h4>
+                        <p><strong>Address:</strong> Shop 15, Connaught Place, New Delhi - 110001</p>
+                        <p><strong>Phone:</strong> +91 98765 43210</p>
+                        <p><strong>Hours:</strong> 11:00 AM - 11:00 PM (All days)</p>
+                        <p><strong>Delivery:</strong> Available via Zomato, Swiggy</p>
+                    </div>
+                    <div>
+                        <h4 style="color: #667eea; margin-bottom: 1rem;">🍽️ Specialties</h4>
+                        <p>• Authentic North Indian Cuisine</p>
+                        <p>• Fresh ingredients daily</p>
+                        <p>• Vegetarian & Non-vegetarian options</p>
+                        <p>• Custom spice levels available</p>
+                    </div>
+                    <div>
+                        <h4 style="color: #667eea; margin-bottom: 1rem;">🏆 Awards & Recognition</h4>
+                        <p>• Best Indian Restaurant 2024</p>
+                        <p>• TripAdvisor Certificate of Excellence</p>
+                        <p>• 4.8/5 Google Reviews</p>
+                        <p>• Featured in Delhi Food Guide</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Floating Cart Button -->
+        <button class="floating-cart-btn" onclick="toggleCart()" id="cartBtn">
+            🛒<span class="cart-count" id="cartCount">0</span>
+        </button>
+        
+        <!-- Cart Sidebar -->
+        <div class="cart-sidebar" id="cartSidebar">
+            <div class="cart-header">
+                <h3>🛒 Your Order</h3>
+                <button class="close-cart" onclick="toggleCart()">✕</button>
+            </div>
+            <div id="cartItems"></div>
+            <div class="cart-total" id="cartTotal">Total: ₹0</div>
+            <button class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;" onclick="placeOrder()">
+                🚀 Place Order
+            </button>
+            <div style="text-align: center; font-size: 0.9rem; color: #666;">
+                <p>📱 Order will be confirmed via WhatsApp</p>
+                <p>⏱️ Estimated delivery: 25-30 minutes</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Demo Screen -->
+    <div class="app-screen animated-bg" id="demo">
+        <div class="auth-container">
+            <div class="auth-card" style="max-width: 700px;">
+                <h2>🎬 Live Demo Experience</h2>
+                <p style="font-size: 1.1rem; color: #666; margin-bottom: 2rem; text-align: center;">
+                    Experience our complete QR Menu platform in action! See how easy it is to manage your restaurant's digital menu.
+                </p>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin: 2rem 0;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">👨‍💼</div>
+                        <h4 style="color: #667eea; margin-bottom: 1rem;">Restaurant Owner View</h4>
+                        <p style="margin-bottom: 1.5rem; color: #666;">Manage your menu, view orders, generate QR codes, and track analytics</p>
+                        <button class="btn btn-primary" onclick="demoLogin()" style="width: 100%;">
+                            🏪 Try Restaurant Dashboard
+                        </button>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">👥</div>
+                        <h4 style="color: #667eea; margin-bottom: 1rem;">Customer Experience</h4>
+                        <p style="margin-bottom: 1.5rem; color: #666;">See how customers view your menu, add items to cart, and place orders</p>
+                        <button class="btn btn-secondary" onclick="showScreen('customerMenu')" style="width: 100%;">
+                            📱 View Customer Menu
+                        </button>
+                    </div>
+                </div>
+                
+                <div style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1)); padding: 2rem; border-radius: 15px; margin: 2rem 0;">
+                    <h4 style="color: 333; margin-bottom: 1rem;">🌟 Demo Features You Can Try:</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; text-align: left;">
+                        <div>
+                            <h5 style="color: #667eea;">Restaurant Dashboard:</h5>
+                            <ul style="color: #666; margin-left: 1rem;">
+                                <li>✅ Add & edit menu items</li>
+                                <li>✅ Generate QR codes</li>
+                                <li>✅ View live analytics</li>
+                                <li>✅ Manage orders</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h5 style="color: #667eea;">Customer Experience:</h5>
+                            <ul style="color: #666; margin-left: 1rem;">
+                                <li>✅ Browse beautiful menu</li>
+                                <li>✅ Add items to cart</li>
+                                <li>✅ Place sample orders</li>
+                                <li>✅ See special offers</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 2rem;">
+                    <p style="color: #666; margin-bottom: 1rem;">Ready to start your own restaurant's digital journey?</p>
+                    <button class="btn btn-primary" onclick="showScreen('signup')" style="font-size: 1.1rem; padding: 1rem 2rem;">
+                        🚀 Start Your Free Trial Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Why Choose Us Section (for landing page) -->
+    <div style="display: none;" id="whyChooseUsSection">
+        <section style="padding: 100px 0; background-image: url(back.gif); background-repeat: no-repeat; background-size: cover;">
+            <div class="container">
+                <h2 class="section-title" style="color: black; margin-bottom: 3rem;">🌟 Why Choose QR Menu Pro?</h2>
+                
+                <div class="features-grid">
+                    <div class="feature-card glass" style="color: white;">
+                        <div class="feature-icon">🇮🇳</div>
+                        <h3 style="color: white;">Made for Indian Restaurants</h3>
+                        <p>Built specifically for Indian dining culture with local pricing, Hindi/English support, and payment integrations</p>
+                    </div>
+                    
+                    <div class="feature-card glass" style="color: white;">
+                        <div class="feature-icon">💰</div>
+                        <h3 style="color: white;">Zero Commission Model</h3>
+                        <p>Unlike food aggregators, we charge no per-order commission. Keep 100% of your profits!</p>
+                    </div>
+                    
+                    <div class="feature-card glass" style="color: white;">
+                        <div class="feature-icon">🛡️</div>
+                        <h3 style="color: white;">COVID-Safe Solution</h3>
+                        <p>Completely contactless ordering system ensuring customer and staff safety</p>
+                    </div>
+                    
+                    <div class="feature-card glass" style="color: white;">
+                        <div class="feature-icon">📈</div>
+                        <h3 style="color: white;">Boost Your Sales</h3>
+                        <p>Stunning food images and smart upselling features increase average order value by 35%</p>
+                    </div>
+                    
+                    <div class="feature-card glass" style="color: white;">
+                        <div class="feature-icon">⚡</div>
+                        <h3 style="color: white;">Lightning Fast Setup</h3>
+                        <p>Go live in under 30 minutes! No technical knowledge required</p>
+                    </div>
+                    
+                    <div class="feature-card glass" style="color: white;">
+                        <div class="feature-icon">🔧</div>
+                        <h3 style="color: white;">24/7 Support</h3>
+                        <p>Dedicated customer support in Hindi & English whenever you need help</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- How It Works Section -->
+    <div style="display: none;" id="howItWorksSection">
+        <section style="padding: 100px 0; background: white;">
+            <div class="container">
+                <h2 class="section-title">🚀 How It Works</h2>
+                <p class="section-subtitle">Get your restaurant online in 4 simple steps</p>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 3rem; margin-top: 4rem;">
+                    <div class="fade-in-up" style="text-align: center;">
+                        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; margin: 0 auto 2rem; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);">1</div>
+                        <h3 style="color: #333; margin-bottom: 1rem; font-size: 1.5rem;">🏪 Sign Up</h3>
+                        <p style="color: #666; line-height: 1.7;">Create your restaurant account in just 2 minutes. No credit card required for free trial!</p>
+                    </div>
+                    
+                    <div class="fade-in-up" style="text-align: center;">
+                        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; margin: 0 auto 2rem; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);">2</div>
+                        <h3 style="color: #333; margin-bottom: 1rem; font-size: 1.5rem;">🎨 Customize Menu</h3>
+                        <p style="color: #666; line-height: 1.7;">Upload your menu items with beautiful photos using our intuitive drag-and-drop builder</p>
+                    </div>
+                    
+                    <div class="fade-in-up" style="text-align: center;">
+                        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; margin: 0 auto 2rem; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);">3</div>
+                        <h3 style="color: #333; margin-bottom: 1rem; font-size: 1.5rem;">📱 Generate QR Codes</h3>
+                        <p style="color: #666; line-height: 1.7;">Download and print QR codes for your tables, takeaway counter, and delivery packages</p>
+                    </div>
+                    
+                    <div class="fade-in-up" style="text-align: center;">
+                        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; margin: 0 auto 2rem; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);">4</div>
+                        <h3 style="color: #333; margin-bottom: 1rem; font-size: 1.5rem;">🚀 Go Live!</h3>
+                        <p style="color: #666; line-height: 1.7;">Customers scan QR codes to instantly view your menu and place orders. That's it!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer style="background: #333; color: white; padding: 60px 0 20px; display: none;" id="footerSection">
+        <div class="container">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 3rem; margin-bottom: 3rem;">
+                <div>
+                    <h3 style="color: #667eea; margin-bottom: 1.5rem; font-size: 1.5rem;">🍽️ QR Menu Pro</h3>
+                    <p style="color: #ccc; line-height: 1.7; margin-bottom: 1rem;">Revolutionizing restaurant experiences with cutting-edge digital menu technology.</p>
+                    <p style="color: #667eea; font-weight: 600;">📞 Ready to Transform Your Restaurant?</p>
+                    <p style="color: #ccc;">🎉 Start your 7-day free trial today!</p>
+                    <button class="btn btn-primary" onclick="showScreen('signup')" style="margin-top: 1rem;">
+                        🚀 Get Started Free
+                    </button>
+                </div>
+                
+                <div>
+                    <h3 style="color: #667eea; margin-bottom: 1.5rem;">🔗 Quick Links</h3>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <a href="#" onclick="scrollToFeatures()" style="color: #ccc; text-decoration: none; transition: color 0.3s;">✨ Features</a>
+                        <a href="#" onclick="scrollToPricing()" style="color: #ccc; text-decoration: none; transition: color 0.3s;">💰 Pricing Plans</a>
+                        <a href="#" onclick="showScreen('demo')" style="color: #ccc; text-decoration: none; transition: color 0.3s;">🎬 Live Demo</a>
+                        <a href="#" style="color: #ccc; text-decoration: none; transition: color 0.3s;">📚 Help Center</a>
+                        <a href="#" style="color: #ccc; text-decoration: none; transition: color 0.3s;">📖 API Documentation</a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 style="color: #667eea; margin-bottom: 1.5rem;">🆘 Support</h3>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <a href="#" style="color: #ccc; text-decoration: none; transition: color 0.3s;">📞 Contact Us</a>
+                        <a href="#" style="color: #ccc; text-decoration: none; transition: color 0.3s;">💬 Live Chat Support</a>
+                        <a href="#" style="color: #ccc; text-decoration: none; transition: color 0.3s;">🎥 Video Tutorials</a>
+                        <a href="#" style="color: #ccc; text-decoration: none; transition: color 0.3s;">❓ FAQ</a>
+                        <p style="color: #4caf50; margin-top: 1rem; font-weight: 600;">📱 WhatsApp: +91 98765 43210</p>
+                        <p style="color: #4caf50; font-weight: 600;">📧 Email: support@qrmenupro.com</p>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 style="color: #667eea; margin-bottom: 1.5rem;">🔒 Security & Trust</h3>
+                    <div style="color: #ccc; line-height: 1.8;">
+                        <p>🔐 SSL Encrypted - Bank-level security</p>
+                        <p>☁️ Cloud Hosted - 99.9% uptime guaranteed</p>
+                        <p>💾 Regular Backups - Data always safe</p>
+                        <p>🛡️ GDPR Compliant - Privacy protected</p>
+                        <p>🏆 ISO 27001 Certified</p>
+                        <p style="color: #4caf50; margin-top: 1rem; font-weight: 600;">✅ Trusted by 5000+ Restaurants</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="text-align: center; padding-top: 2rem; border-top: 1px solid #555; color: #ccc;">
+                <p>&copy; 2024 QR Menu Pro. Made with ❤️ for Indian Restaurants. 🇮🇳</p>
+                <p style="margin-top: 0.5rem;">🚀 Transform your restaurant • Go digital in 30 minutes • Zero commission forever!</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // App State Management
+        let currentUser = null;
+        let menuItems = [];
+        let cart = [];
+        let orders = [];
+
+        // Sample data with complete information
+        const sampleMenuItems = [
+            {
+                id: 1,
+                name: "Butter Chicken",
+                description: "Tender chicken pieces in creamy tomato-based curry with aromatic spices. A classic North Indian favorite!",
+                price: 320,
+                category: "mains",
+                tags: ["popular", "spicy"],
+                image: "🍗",
+                rating: 4.8,
+                prepTime: "15-20 mins"
+            },
+            {
+                id: 2,
+                name: "Paneer Tikka",
+                description: "Cubes of cottage cheese marinated in yogurt and spices, grilled to perfection in tandoor",
+                price: 280,
+                category: "starters",
+                tags: ["veg", "popular"],
+                image: "🧀",
+                rating: 4.6,
+                prepTime: "10-15 mins"
+            },
+            {
+                id: 3,
+                name: "Gulab Jamun",
+                description: "Soft milk dumplings soaked in rose-scented sugar syrup. The perfect sweet ending to your meal!",
+                price: 120,
+                category: "desserts",
+                tags: ["veg", "popular"],
+                image: "🍯",
+                rating: 4.9,
+                prepTime: "5 mins"
+            },
+            {
+                id: 4,
+                name: "Masala Chai",
+                description: "Traditional Indian spiced tea brewed with cardamom, ginger, and aromatic spices",
+                price: 50,
+                category: "beverages",
+                tags: ["veg"],
+                image: "☕",
+                rating: 4.7,
+                prepTime: "3-5 mins"
+            },
+            {
+                id: 5,
+                name: "Chicken Biryani",
+                description: "Fragrant basmati rice layered with spiced chicken, cooked in traditional dum style",
+                price: 380,
+                category: "mains",
+                tags: ["popular", "spicy"],
+                image: "🍛",
+                rating: 4.8,
+                prepTime: "25-30 mins"
+            },
+            {
+                id: 6,
+                name: "Samosa (2 pcs)",
+                description: "Crispy golden triangular pastries filled with spiced potatoes and peas. Served with chutneys",
+                price: 80,
+                category: "starters",
+                tags: ["veg"],
+                image: "🥟",
+                rating: 4.5,
+                prepTime: "8-10 mins"
+            },
+            {
+                id: 7,
+                name: "Kulfi",
+                description: "Traditional Indian ice cream with pistachios and cardamom. Rich, creamy, and absolutely divine!",
+                price: 100,
+                category: "desserts",
+                tags: ["veg"],
+                image: "🍦",
+                rating: 4.4,
+                prepTime: "2 mins"
+            },
+            {
+                id: 8,
+                name: "Fresh Lime Soda",
+                description: "Refreshing lime soda with mint and black salt. Perfect thirst quencher for Indian weather",
+                price: 70,
+                category: "beverages",
+                tags: ["veg"],
+                image: "🍋",
+                rating: 4.3,
+                prepTime: "3 mins"
+            }
+        ];
+
+        // Initialize app
+        function initApp() {
+            menuItems = [...sampleMenuItems];
+            updateMenuDisplay();
+            updateCustomerMenu();
+            generateQRCode();
+            
+            // Add sections to landing page
+            const landing = document.getElementById('landing');
+            const whySection = document.getElementById('whyChooseUsSection');
+            const howSection = document.getElementById('howItWorksSection');
+            const footerSection = document.getElementById('footerSection');
+            
+            if (whySection) {
+                whySection.style.display = 'block';
+                landing.appendChild(whySection.children[0]);
+            }
+            if (howSection) {
+                howSection.style.display = 'block';
+                landing.appendChild(howSection.children[0]);
+            }
+            if (footerSection) {
+                footerSection.style.display = 'block';
+                document.body.appendChild(footerSection.children[0]);
+            }
+            
+            // Initialize scroll animations
+            initScrollAnimations();
+        }
+
+        // Mobile Navigation
+        function toggleMobileNav() {
+            const mobileNav = document.getElementById('mobileNav');
+            mobileNav.classList.toggle('open');
+        }
+
+        // Scroll animations
+        function initScrollAnimations() {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.fade-in-up').forEach(el => {
+                observer.observe(el);
+            });
+        }
+
+        // Navigation functions
+        function scrollToFeatures() {
+            document.getElementById('featuresSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function scrollToPricing() {
+            document.getElementById('pricingSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Screen Navigation
+        function showScreen(screenId) {
+            document.querySelectorAll('.app-screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+            
+            if (screenId === 'dashboard' && !currentUser) {
+                showScreen('login');
+                return;
+            }
+            
+            // Update URL hash
+            window.history.pushState({}, '', `#${screenId}`);
+            
+            // Close mobile nav if open
+            const mobileNav = document.getElementById('mobileNav');
+            if (mobileNav.classList.contains('open')) {
+                mobileNav.classList.remove('open');
+            }
+        }
+
+        // Tab Navigation
+        function showTab(tabId) {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        // Authentication
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const userData = {
+                restaurantName: document.getElementById('restaurantName').value,
+                ownerName: document.getElementById('ownerName').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                plan: document.getElementById('plan').value
+            };
+            
+            currentUser = userData;
+            updateUserInterface();
+            showNotification('🎉 Account created successfully! Welcome to QR Menu Pro! Your 7-day free trial has started.');
+            showScreen('dashboard');
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            currentUser = {
+                restaurantName: "Demo Restaurant",
+                ownerName: "Restaurant Owner",
+                email: document.getElementById('loginEmail').value,
+                plan: "premium"
+            };
+            
+            updateUserInterface();
+            showNotification('✅ Welcome back! Login successful!');
+            showScreen('dashboard');
+        });
+
+        function demoLogin() {
+            currentUser = {
+                restaurantName: "Tasty Bites Restaurant",
+                ownerName: "Demo Owner",
+                email: "demo@restaurant.com",
+                plan: "premium"
+            };
+            updateUserInterface();
+            showNotification('🎬 Demo mode activated! Explore all features freely.');
+            showScreen('dashboard');
+        }
+
+        function logout() {
+            currentUser = null;
+            updateUserInterface();
+            showScreen('landing');
+            showNotification('👋 Logged out successfully! Thank you for using QR Menu Pro.');
+        }
+
+        function updateUserInterface() {
+            const authButtons = document.getElementById('authButtons');
+            const userInfo = document.getElementById('userInfo');
+            const userName = document.getElementById('userName');
+            const restaurantName = document.getElementById('dashboardRestaurantName');
+            const customerRestaurantName = document.getElementById('customerRestaurantName');
+            
+            if (currentUser) {
+                authButtons.style.display = 'none';
+                userInfo.style.display = 'flex';
+                userName.textContent = currentUser.ownerName;
+                restaurantName.textContent = currentUser.restaurantName;
+                customerRestaurantName.textContent = currentUser.restaurantName;
+            } else {
+                authButtons.style.display = 'flex';
+                userInfo.style.display = 'none';
+            }
+        }
+
+        // Menu Management
+        document.getElementById('menuItemForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newItem = {
+                id: Date.now(),
+                name: document.getElementById('itemName').value,
+                description: document.getElementById('itemDescription').value,
+                price: parseInt(document.getElementById('itemPrice').value),
+                category: document.getElementById('itemCategory').value,
+                tags: [],
+                image: getRandomEmoji(),
+                rating: (4.0 + Math.random() * 1.0).toFixed(1),
+                prepTime: getRandomPrepTime()
+            };
+            
+            // Add tags
+            if (document.getElementById('tagVeg').checked) newItem.tags.push('veg');
+            if (document.getElementById('tagSpicy').checked) newItem.tags.push('spicy');
+            if (document.getElementById('tagPopular').checked) newItem.tags.push('popular');
+            
+            menuItems.push(newItem);
+            updateMenuDisplay();
+            updateCustomerMenu();
+            
+            // Reset form
+            document.getElementById('menuItemForm').reset();
+            showNotification(`🍽️ "${newItem.name}" added successfully to your menu!`);
+        });
+
+        function getRandomEmoji() {
+            const foodEmojis = ['🍗', '🍖', '🧀', '🥗', '🍛', '🍜', '🍕', '🌮', '🍰', '☕', '🍤', '🥘', '🍳', '🥙', '🌯'];
+            return foodEmojis[Math.floor(Math.random() * foodEmojis.length)];
+        }
+
+        function getRandomPrepTime() {
+            const times = ['5-8 mins', '10-15 mins', '15-20 mins', '20-25 mins', '25-30 mins'];
+            return times[Math.floor(Math.random() * times.length)];
+        }
+
+        function updateMenuDisplay() {
+            const menuItemsContainer = document.getElementById('menuItems');
+            menuItemsContainer.innerHTML = '';
+            
+            if (menuItems.length === 0) {
+                menuItemsContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🍽️</div>
+                        <h4>No menu items yet</h4>
+                        <p>Add your first menu item to get started!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            menuItems.forEach(item => {
+                const menuItemEl = document.createElement('div');
+                menuItemEl.className = 'menu-item';
+                menuItemEl.innerHTML = `
+                    <div class="menu-item-info">
+                        <h4>${item.image} ${item.name}</h4>
+                        <p style="color: #666; margin-bottom: 0.5rem;">${item.description}</p>
+                        <div class="item-tags">
+                            ${item.tags.map(tag => `<span class="tag ${tag}">${tag}</span>`).join('')}
+                            <span class="tag">⭐ ${item.rating}</span>
+                            <span class="tag">⏱️ ${item.prepTime}</span>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="menu-item-price">₹${item.price}</div>
+                        <div class="menu-item-actions" style="margin-top: 1rem;">
+                            <button class="btn btn-sm btn-secondary" onclick="editMenuItem(${item.id})">✏️ Edit</button>
+                            <button class="btn btn-sm btn-secondary" onclick="deleteMenuItem(${item.id})" style="background: #f44336;">🗑️ Delete</button>
+                        </div>
+                    </div>
+                `;
+                menuItemsContainer.appendChild(menuItemEl);
+            });
+        }
+
+        function deleteMenuItem(id) {
+            const item = menuItems.find(item => item.id === id);
+            if (confirm(`Are you sure you want to delete "${item.name}" from your menu?`)) {
+                menuItems = menuItems.filter(item => item.id !== id);
+                updateMenuDisplay();
+                updateCustomerMenu();
+                showNotification(`🗑️ "${item.name}" removed from menu successfully!`);
+            }
+        }
+
+        function editMenuItem(id) {
+            const item = menuItems.find(item => item.id === id);
+            if (item) {
+                document.getElementById('itemName').value = item.name;
+                document.getElementById('itemDescription').value = item.description;
+                document.getElementById('itemPrice').value = item.price;
+                document.getElementById('itemCategory').value = item.category;
+                document.getElementById('tagVeg').checked = item.tags.includes('veg');
+                document.getElementById('tagSpicy').checked = item.tags.includes('spicy');
+                document.getElementById('tagPopular').checked = item.tags.includes('popular');
+                
+                showNotification(`✏️ Editing "${item.name}". Make changes and add again.`);
+                deleteMenuItem(id);
+            }
+        }
+
+        // Customer Menu
+        function updateCustomerMenu() {
+            const categories = [
+                { id: 'starters', name: 'Starters & Appetizers' },
+                { id: 'mains', name: 'Main Course' },
+                { id: 'desserts', name: 'Desserts' },
+                { id: 'beverages', name: 'Beverages' }
+            ];
+            
+            categories.forEach(category => {
+                const container = document.getElementById(category.id + 'Items');
+                if (container) {
+                    container.innerHTML = '';
+                    
+                    const categoryItems = menuItems.filter(item => item.category === category.id);
+                    
+                    if (categoryItems.length === 0) {
+                        container.innerHTML = `
+                            <div class="empty-state">
+                                <div class="empty-state-icon">🍽️</div>
+                                <p>No items in this category yet</p>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    categoryItems.forEach(item => {
+                        const itemEl = document.createElement('div');
+                        itemEl.className = 'customer-menu-item';
+                        itemEl.innerHTML = `
+                            <div class="item-image">${item.image}</div>
+                            <div class="item-details">
+                                <h4>${item.name}</h4>
+                                <p style="color: #666; margin-bottom: 0.5rem;">${item.description}</p>
+                                <div style="display: flex; gap: 1rem; margin-bottom: 0.5rem; font-size: 0.9rem; color: #888;">
+                                    <span>⭐ ${item.rating}</span>
+                                    <span>⏱️ ${item.prepTime}</span>
+                                </div>
+                                <div class="item-tags">
+                                    ${item.tags.map(tag => `<span class="tag ${tag}">${tag}</span>`).join('')}
+                                </div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div class="menu-item-price" style="margin-bottom: 1rem;">₹${item.price}</div>
+                                <button class="add-to-cart" onclick="addToCart(${item.id})">
+                                    🛒 Add to Cart
+                                </button>
+                            </div>
+                        `;
+                        container.appendChild(itemEl);
+                    });
+                }
+            });
+        }
+
+        // Cart Management
+        function addToCart(itemId) {
+            const item = menuItems.find(item => item.id === itemId);
+            if (item) {
+                const existingItem = cart.find(cartItem => cartItem.id === itemId);
+                if (existingItem) {
+                    existingItem.quantity += 1;
+                } else {
+                    cart.push({...item, quantity: 1});
+                }
+                updateCartDisplay();
+                showNotification(`✅ ${item.name} added to cart!`);
+            }
+        }
+
+        function removeFromCart(itemId) {
+            const item = cart.find(item => item.id === itemId);
+            cart = cart.filter(item => item.id !== itemId);
+            updateCartDisplay();
+            showNotification(`🗑️ Item removed from cart`);
+        }
+
+        function updateCartQuantity(itemId, change) {
+            const item = cart.find(item => item.id === itemId);
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) {
+                    removeFromCart(itemId);
+                } else {
+                    updateCartDisplay();
+                }
+            }
+        }
+
+        function updateCartDisplay() {
+            const cartItems = document.getElementById('cartItems');
+            const cartTotal = document.getElementById('cartTotal');
+            const cartCount = document.getElementById('cartCount');
+            
+            cartItems.innerHTML = '';
+            let total = 0;
+            let itemCount = 0;
+            
+            if (cart.length === 0) {
+                cartItems.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🛒</div>
+                        <h4>Your cart is empty</h4>
+                        <p>Add some delicious items to get started!</p>
+                    </div>
+                `;
+                cartTotal.textContent = 'Total: ₹0';
+                cartCount.textContent = '0';
+                return;
+            }
+            
+            cart.forEach(item => {
+                const cartItemEl = document.createElement('div');
+                cartItemEl.className = 'cart-item';
+                cartItemEl.innerHTML = `
+                    <div>
+                        <h5>${item.image} ${item.name}</h5>
+                        <p style="color: #666; font-size: 0.9rem;">₹${item.price} each</p>
+                        <div class="quantity-controls">
+                            <button class="quantity-btn" onclick="updateCartQuantity(${item.id}, -1)">-</button>
+                            <span class="quantity-display">${item.quantity}</span>
+                            <button class="quantity-btn" onclick="updateCartQuantity(${item.id}, 1)">+</button>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-weight: bold; color: #667eea; font-size: 1.1rem;">₹${item.price * item.quantity}</div>
+                        <button onclick="removeFromCart(${item.id})" style="background: #f44336; color: white; border: none; padding: 0.3rem 0.6rem; border-radius: 5px; font-size: 0.8rem; margin-top: 0.5rem; cursor: pointer;">🗑️ Remove</button>
+                    </div>
+                `;
+                cartItems.appendChild(cartItemEl);
+                total += item.price * item.quantity;
+                itemCount += item.quantity;
+            });
+            
+            cartTotal.innerHTML = `
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>Subtotal:</span>
+                    <span>₹${total}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>Taxes (5%):</span>
+                    <span>₹${Math.round(total * 0.05)}</span>
+                </div>
+                <hr style="margin: 0.5rem 0;">
+                <div style="display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: bold;">
+                    <span>Total:</span>
+                    <span>₹${Math.round(total * 1.05)}</span>
+                </div>
+            `;
+            cartCount.textContent = itemCount;
+        }
+
+        function toggleCart() {
+            const cartSidebar = document.getElementById('cartSidebar');
+            cartSidebar.classList.toggle('open');
+        }
+
+        function placeOrder() {
+            if (cart.length === 0) {
+                showNotification('❌ Your cart is empty! Add some items first.');
+                return;
+            }
+            
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const total = Math.round(subtotal * 1.05);
+            
+            const order = {
+                id: Date.now(),
+                items: [...cart],
+                subtotal: subtotal,
+                tax: Math.round(subtotal * 0.05),
+                total: total,
+                timestamp: new Date().toLocaleString('en-IN'),
+                status: 'confirmed',
+                customerInfo: {
+                    table: 'Table 5', // In real app, this would be dynamic
+                    phone: '+91 98765 43210'
+                }
+            };
+            
+            orders.unshift(order);
+            cart = [];
+            updateCartDisplay();
+            updateOrdersDisplay();
+            toggleCart();
+            
+            showNotification(`🎉 Order #${order.id} placed successfully! Your food will be ready in 15-20 minutes.`);
+            
+            // Simulate WhatsApp confirmation
+            setTimeout(() => {
+                showNotification('📱 Order confirmation sent via WhatsApp!');
+            }, 2000);
+        }
+
+        // Orders Management
+        function updateOrdersDisplay() {
+            const ordersList = document.getElementById('ordersList');
+            if (!ordersList) return;
+            
+            ordersList.innerHTML = '';
+            
+            if (orders.length === 0) {
+                ordersList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <h4>No orders yet</h4>
+                        <p>Orders will appear here once customers start ordering</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            orders.forEach(order => {
+                const statusColor = {
+                    'confirmed': '#4caf50',
+                    'preparing': '#ff9800',
+                    'ready': '#2196f3',
+                    'delivered': '#9c27b0',
+                    'completed': '#4caf50'
+                };
+                
+                const orderEl = document.createElement('div');
+                orderEl.style.cssText = 'background: rgba(255,255,255,0.9); backdrop-filter: blur(20px); padding: 2rem; border-radius: 20px; margin-bottom: 1.5rem; border: 1px solid rgba(102, 126, 234, 0.1); transition: all 0.3s;';
+                orderEl.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <div>
+                            <h4 style="color: #333; margin-bottom: 0.5rem;">🍽️ Order #${order.id}</h4>
+                            <p style="color: #666; font-size: 0.9rem;">${order.timestamp} • ${order.customerInfo.table}</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <span style="background: ${statusColor[order.status]}; color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">
+                                ${order.status}
+                            </span>
+                            <p style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">📱 ${order.customerInfo.phone}</p>
+                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(102, 126, 234, 0.05); padding: 1rem; border-radius: 10px; margin-bottom: 1rem;">
+                        <h5 style="color: #667eea; margin-bottom: 0.5rem;">Order Items:</h5>
+                        ${order.items.map(item => `
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;">
+                                <span>${item.image} ${item.name} x ${item.quantity}</span>
+                                <span style="font-weight: 600;">₹${item.price * item.quantity}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <p style="margin: 0.2rem 0;"><strong>Subtotal:</strong> ₹${order.subtotal}</p>
+                            <p style="margin: 0.2rem 0;"><strong>Tax (5%):</strong> ₹${order.tax}</p>
+                            <p style="font-size: 1.2rem; font-weight: bold; color: #667eea;"><strong>Total: ₹${order.total}</strong></p>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            ${order.status === 'confirmed' ? `<button class="btn btn-sm btn-secondary" onclick="updateOrderStatus(${order.id}, 'preparing')" style="background: #ff9800;">🍳 Start Preparing</button>` : ''}
+                            ${order.status === 'preparing' ? `<button class="btn btn-sm btn-secondary" onclick="updateOrderStatus(${order.id}, 'ready')" style="background: #2196f3;">✅ Mark Ready</button>` : ''}
+                            ${order.status === 'ready' ? `<button class="btn btn-sm btn-secondary" onclick="updateOrderStatus(${order.id}, 'completed')" style="background: #4caf50;">🚀 Mark Delivered</button>` : ''}
+                        </div>
+                    </div>
+                `;
+                
+                orderEl.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                    this.style.boxShadow = '0 20px 40px rgba(102, 126, 234, 0.15)';
+                });
+                
+                orderEl.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'none';
+                });
+                
+                ordersList.appendChild(orderEl);
+            });
+        }
+
+        function updateOrderStatus(orderId, newStatus) {
+            const order = orders.find(o => o.id === orderId);
+            if (order) {
+                order.status = newStatus;
+                updateOrdersDisplay();
+                
+                const statusMessages = {
+                    'preparing': '🍳 Order marked as preparing',
+                    'ready': '✅ Order ready for pickup/delivery',
+                    'completed': '🎉 Order completed successfully'
+                };
+                
+                showNotification(statusMessages[newStatus]);
+            }
+        }
+
+        // QR Code Management
+        function generateQRCode() {
+            const restaurantName = currentUser ? currentUser.restaurantName : 'Demo Restaurant';
+            const menuUrl = `${window.location.origin}${window.location.pathname}#customerMenu`;
+            document.getElementById('menuUrl').value = menuUrl;
+            
+            const qrCode = document.getElementById('qrCode');
+            qrCode.innerHTML = `
+                <div class="qr-code-content">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">📱</div>
+                    <div style="font-size: 1rem; line-height: 1.5;">
+                        <strong>Scan to Order</strong><br>
+                        ${restaurantName}<br>
+                        <span style="font-size: 0.8rem; opacity: 0.8;">Digital Menu</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateQR() {
+            generateQRCode();
+            showNotification('📱 New QR code generated successfully!');
+        }
+
+        function downloadQR() {
+            showNotification('💾 QR code download started! (In real app, this would download the QR image)');
+        }
+
+        function printQR() {
+            showNotification('🖨️ Print dialog opened! (Demo feature - would open print dialog for QR code)');
+        }
+
+        // Notifications
+        function showNotification(message, isError = false) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${isError ? 'error' : ''}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+
+        // Initialize app on load
+        document.addEventListener('DOMContentLoaded', function() {
+            initApp();
+            
+            // Add some demo orders after initialization
+            setTimeout(() => {
+                if (orders.length === 0) {
+                    orders.push({
+                        id: 1001,
+                        items: [
+                            {name: 'Butter Chicken', image: '🍗', quantity: 1, price: 320},
+                            {name: 'Masala Chai', image: '☕', quantity: 2, price: 50}
+                        ],
+                        subtotal: 420,
+                        tax: 21,
+                        total: 441,
+                        timestamp: new Date(Date.now() - 3600000).toLocaleString('en-IN'),
+                        status: 'completed',
+                        customerInfo: { table: 'Table 3', phone: '+91 98765 43210' }
+                    });
+                    
+                    orders.push({
+                        id: 1002,
+                        items: [
+                            {name: 'Chicken Biryani', image: '🍛', quantity: 2, price: 380},
+                            {name: 'Gulab Jamun', image: '🍯', quantity: 1, price: 120}
+                        ],
+                        subtotal: 880,
+                        tax: 44,
+                        total: 924,
+                        timestamp: new Date(Date.now() - 1800000).toLocaleString('en-IN'),
+                        status: 'preparing',
+                        customerInfo: { table: 'Table 7', phone: '+91 87654 32109' }
+                    });
+                    
+                    updateOrdersDisplay();
+                }
+            }, 2000);
+        });
+
+        // Handle browser navigation
+        window.addEventListener('popstate', function() {
+            const hash = window.location.hash.substring(1);
+            if (hash && document.getElementById(hash)) {
+                showScreen(hash);
+            } else {
+                showScreen('landing');
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case '1':
+                        e.preventDefault();
+                        if (currentUser) showTab('overview');
+                        break;
+                    case '2':
+                        e.preventDefault();
+                        if (currentUser) showTab('menu');
+                        break;
+                    case '3':
+                        e.preventDefault();
+                        if (currentUser) showTab('qr');
+                        break;
+                    case '4':
+                        e.preventDefault();
+                        if (currentUser) showTab('orders');
+                        break;
+                    case '5':
+                        e.preventDefault();
+                        if (currentUser) showTab('analytics');
+                        break;
+                }
+            }
+        });
+
+        // Auto-save simulation
+        setInterval(() => {
+            if (currentUser && menuItems.length > 0) {
+                // In real app, this would save to server
+                console.log('📁 Auto-saved menu data and settings');
+            }
+        }, 60000); // Auto-save every minute
+
+        // Handle initial URL hash
+        window.addEventListener('load', function() {
+            const hash = window.location.hash.substring(1);
+            if (hash && document.getElementById(hash)) {
+                showScreen(hash);
+            }
+        });
+    </script>
+</body>
+</html>
